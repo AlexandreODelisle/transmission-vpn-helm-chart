@@ -1,0 +1,50 @@
+serviceName: transmission
+# image: lscr.io/linuxserver/transmission
+image: haugene/transmission-openvpn
+tag: latest
+port: 9091
+permissions:
+  PUID: 1030
+  PGID: 1000
+configuration:
+  client: 
+    downloadDir: /downloads
+    downloadQueueSize: "10"
+    ratioLimit: "2"
+    ratioLimitEnabled: "true"
+    uploadLimit: "5000"
+    uploadLimitEnabled: "true"
+    downloadLimit: "5000"
+    downloadLimitEnabled: "true"
+  vpn:
+    localNetwork: 10.0.0.0/8
+    endpoint: ca-mon.prod.surfshark.com_udp
+    options: --inactive 3600 --ping 10 --ping-exit 60 --script-security 2
+    provider: SURFSHARK
+    secrets: 
+    - variableName: OPENVPN_USERNAME
+      secretName: surfshark-vpn
+      secretKey: username
+    - variableName: OPENVPN_PASSWORD
+      secretName: surfshark-vpn
+      secretKey: password
+  network:
+    domain: domain.com
+storage:
+  nfs:
+    IPAddress: 10.0.0.0
+  mounts: 
+    downloads:
+      storage: 800Gi
+      storageClaim: 250Gi
+      accessModes: [ReadWriteMany]
+      path: "/volume1/kubernetes/downloads"
+      mountPath: /downloads
+      subPath: ""
+    configs:
+      storage: 800Gi
+      storageClaim: 250Gi
+      accessModes: [ReadWriteMany]
+      path: "/volume1/kubernetes/configs"
+      mountPath: /configs
+      subPath: "transmission"

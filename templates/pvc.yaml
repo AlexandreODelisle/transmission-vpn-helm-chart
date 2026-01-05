@@ -1,0 +1,17 @@
+{{- range $storage, $config := $.Values.storage.mounts }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $storage }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  storageClassName: ""
+  selector:
+    matchLabels:
+      type: {{ $storage }}
+  accessModes: {{ $config.accessModes }}
+  resources:
+    requests:
+      storage: {{ $config.storageClaim }}
+{{- end }}

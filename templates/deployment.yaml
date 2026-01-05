@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.serviceName }}
+  namespace: {{ $.Release.Namespace }}
+  labels: 
+    app: {{ $.Values.serviceName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $.Values.serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Values.serviceName }}
+    spec:
+      containers:
+      - name: {{ $.Values.serviceName }}
+        image: "{{ $.Values.image }}:{{ $.Values.tag }}"
+        env:
+        - name: TRANSMISSION_DOWNLOAD_DIR
+          value: {{ $.Values.configuration.client.downloadDir | quote }}
+        - name: TRANSMISSION_DOWNLOAD_QUEUE_SIZE
+          value: {{ $.Values.configuration.client.downloadQueueSize | quote }}
+        - name: TRANSMISSION_RATIO_LIMIT
+          value: {{ $.Values.configuration.client.ratioLimit | quote }}
+        - name: TRANSMISSION_RATIO_LIMIT_ENABLED
+          value: {{ $.Values.configuration.client.ratioLimitEnabled | quote }}
+        - name: TRANSMISSION_SPEED_LIMIT_DOWN
+          value: {{ $.Values.configuration.client.downloadLimit | quote }}
+        - name: TRANSMISSION_SPEED_LIMIT_DOWN_ENABLED
+          value: {{ $.Values.configuration.client.downloadLimitEnabled | quote }}
+        - name: TRANSMISSION_SPEED_LIMIT_UP
+          value: {{ $.Values.configuration.client.uploadLimit | quote }}
+        - name: TRANSMISSION_SPEED_LIMIT_UP_ENABLED
+          value: {{ $.Values.configuration.client.uploadLimitEnabled | quote }}
+        # VPN Provider
+        - name: LOCAL_NETWORK
+          value: {{ $.Values.configuration.vpn.localNetwork | quote }}
+        - name: OPENVPN_PROVIDER
+          value: {{ $.Values.configuration.vpn.provider  | quote }}
+        - name: OPENVPN_CONFIG
+          value: {{ $.Values.configuration.vpn.endpoint | quote }}
+        - name: OPENVPN_OPTS
+          value: {{ $.Values.configuration.vpn.options | quote }}
+        #VPN Provider Secrets
+        {{- range $secret := $.Values.configuration.vpn.secrets }}
+        - name: {{ $secret.variableName }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secret.secretName| quote }}
+              key: {{ $secret.secretKey | quote }}
+        {{- end }}
+        securityContext:
+          capabilities:
+            drop:
+              - ALL
+            add:
+              - NET_ADMIN
+              - mknod
+              - CAP_SETUID
+              - CAP_SETGID
+        ports:
+        - containerPort: {{ $.Values.port }} 
+
+        volumeMounts:
+          - name: configs
+            mountPath: /config
+            subPath: {{ $.Values.serviceName }}
+          - name: downloads
+            mountPath: /downloads
+      volumes:
+      - name: configs
+        persistentVolumeClaim:
+          claimName: configs
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: downloads

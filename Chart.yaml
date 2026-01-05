@@ -1,0 +1,12 @@
+apiVersion: v2
+description: Transmission + VPN service deployment 
+name: transmission
+type: application
+version: "0.0.1"
+appVersion: "v5.3.2"
+keywords:
+  - transmission
+  - vpn
+maintainers:
+  - name: Alexandre Delisle
+    email: alexodelisle@gmail.com

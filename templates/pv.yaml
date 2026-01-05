@@ -1,0 +1,22 @@
+{{- range $storage, $config := $.Values.storage.mounts }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $storage }}
+  labels:
+    type: {{ $storage }}
+spec:
+  storageClassName: ""
+  capacity:
+    storage: {{ $config.storage }}
+  accessModes: {{ $config.accessModes }}
+  mountOptions:
+    - hard
+    - nfsvers=4.0
+    - nolock
+    - rw
+  nfs:
+    server: {{ $.Values.storage.nfs.IPAddress }}
+    path: {{ $config.path }}
+{{- end }}
