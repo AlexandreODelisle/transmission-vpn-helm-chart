@@ -53,15 +53,15 @@ spec:
               name: {{ $secret.secretName| quote }}
               key: {{ $secret.secretKey | quote }}
         {{- end }}
-        securityContext:
-          capabilities:
-            drop:
-              - ALL
-            add:
-              - NET_ADMIN
-              - mknod
-              - CAP_SETUID
-              - CAP_SETGID
+        # securityContext:
+        #   capabilities:
+        #     drop:
+        #       - ALL
+        #     add:
+        #       - NET_ADMIN
+        #       - mknod
+        #       - CAP_SETUID
+        #       - CAP_SETGID
         ports:
         - containerPort: {{ $.Values.port }} 
 
