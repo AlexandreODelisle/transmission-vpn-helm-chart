@@ -53,7 +53,8 @@ spec:
               name: {{ $secret.secretName| quote }}
               key: {{ $secret.secretKey | quote }}
         {{- end }}
-        # securityContext:
+        securityContext:
+          privileged: true
         #   capabilities:
         #     drop:
         #       - ALL
