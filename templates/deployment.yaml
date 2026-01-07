@@ -72,6 +72,8 @@ spec:
             subPath: {{ $.Values.serviceName }}
           - name: downloads
             mountPath: /downloads
+          - name: tun
+            mountPath: /dev/net/tun
       volumes:
       - name: configs
         persistentVolumeClaim:
@@ -79,3 +81,6 @@ spec:
       - name: downloads
         persistentVolumeClaim:
           claimName: downloads
+      - name: tun
+        hostPath:
+          path: /dev/net/tun
